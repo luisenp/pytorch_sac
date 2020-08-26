@@ -1,11 +1,9 @@
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import math
 
-from agent import Agent
-import utils
+from pytorch_sac.agent import Agent
+from pytorch_sac import utils
 
 import hydra
 
