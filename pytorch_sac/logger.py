@@ -1,6 +1,5 @@
 from torch.utils.tensorboard import SummaryWriter
 from collections import defaultdict
-import json
 import os
 import csv
 import shutil
@@ -93,7 +92,7 @@ class MetersGroup(object):
         elif ty == 'time':
             return f'{key}: {value:04.1f} s'
         else:
-            raise f'invalid format type: {ty}'
+            raise ValueError(f'invalid format type: {ty}')
 
     def _dump_to_console(self, data, prefix):
         prefix = colored(prefix, 'yellow' if prefix == 'train' else 'green')
@@ -201,4 +200,4 @@ class Logger(object):
         elif ty == 'train':
             self._train_mg.dump(step, 'train', save)
         else:
-            raise f'invalid log type: {ty}'
+            raise ValueError(f'invalid log type: {ty}')

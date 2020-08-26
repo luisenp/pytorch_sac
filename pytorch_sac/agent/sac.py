@@ -14,7 +14,7 @@ class SACAgent(Agent):
                  actor_cfg, discount, init_temperature, alpha_lr, alpha_betas,
                  actor_lr, actor_betas, actor_update_frequency, critic_lr,
                  critic_betas, critic_tau, critic_target_update_frequency,
-                 batch_size, learnable_temperature):
+                 batch_size, learnable_temperature, target_entropy=None):
         super().__init__()
 
         self.action_range = action_range
@@ -35,8 +35,8 @@ class SACAgent(Agent):
 
         self.log_alpha = torch.tensor(np.log(init_temperature)).to(self.device)
         self.log_alpha.requires_grad = True
-        # set target entropy to -|A|
-        self.target_entropy = -action_dim
+        # default target entropy to -|A|
+        self.target_entropy = target_entropy if target_entropy else -action_dim
 
         # optimizers
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(),
@@ -63,14 +63,18 @@ class SACAgent(Agent):
     def alpha(self):
         return self.log_alpha.exp()
 
-    def act(self, obs, sample=False):
+    def act(self, obs, sample=False, batched=False):
         obs = torch.FloatTensor(obs).to(self.device)
-        obs = obs.unsqueeze(0)
+        if not batched:
+            obs = obs.unsqueeze(0)
         dist = self.actor(obs)
         action = dist.sample() if sample else dist.mean
         action = action.clamp(*self.action_range)
-        assert action.ndim == 2 and action.shape[0] == 1
-        return utils.to_np(action[0])
+        if not batched:
+            assert action.ndim == 2 and action.shape[0] == 1
+            return utils.to_np(action[0])
+        assert action.ndim == 2
+        return utils.to_np(action)
 
     def update_critic(self, obs, action, reward, next_obs, not_done, logger,
                       step):
