@@ -118,7 +118,9 @@ class Logger(object):
                  log_dir,
                  save_tb=False,
                  log_frequency=10000,
-                 agent='sac'):
+                 agent='sac',
+                 train_format=None,
+                 eval_format=None):
         self._log_dir = log_dir
         self._log_frequency = log_frequency
         if save_tb:
@@ -132,13 +134,15 @@ class Logger(object):
             self._sw = SummaryWriter(tb_dir)
         else:
             self._sw = None
-        # each agent has specific output format for training
-        assert agent in AGENT_TRAIN_FORMAT
-        train_format = COMMON_TRAIN_FORMAT + AGENT_TRAIN_FORMAT[agent]
-        self._train_mg = MetersGroup(os.path.join(log_dir, 'train'),
+        if not train_format:
+            # each agent has specific output format for training
+            assert agent in AGENT_TRAIN_FORMAT
+            train_format = COMMON_TRAIN_FORMAT + AGENT_TRAIN_FORMAT[agent]
+        eval_format = eval_format if eval_format else COMMON_EVAL_FORMAT
+        self._train_mg = MetersGroup(os.path.join(log_dir, f'{agent}_train'),
                                      formating=train_format)
-        self._eval_mg = MetersGroup(os.path.join(log_dir, 'eval'),
-                                    formating=COMMON_EVAL_FORMAT)
+        self._eval_mg = MetersGroup(os.path.join(log_dir, f'{agent}_eval'),
+                                    formating=eval_format)
 
     def _should_log(self, step, log_frequency):
         log_frequency = log_frequency or self._log_frequency
