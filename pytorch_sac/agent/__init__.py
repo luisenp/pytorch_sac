@@ -15,5 +15,5 @@ class Agent(object):
         """Main function of the agent that performs learning."""
 
     @abc.abstractmethod
-    def act(self, obs, sample=False):
+    def act(self, obs, sample=False, batched=False):
         """Issues an action given an observation."""

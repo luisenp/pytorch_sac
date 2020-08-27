@@ -36,6 +36,31 @@ class ReplayBuffer(object):
         self.idx = (self.idx + 1) % self.capacity
         self.full = self.full or self.idx == 0
 
+    def add_batch(self, obs, action, reward, next_obs, done, done_no_max):
+        def copy_from_to(buffer_start, batch_start, how_many):
+            buffer_slice = slice(buffer_start, buffer_start + how_many)
+            batch_slice = slice(batch_start, batch_start + how_many)
+            np.copyto(self.obses[buffer_slice], obs[batch_slice])
+            np.copyto(self.actions[buffer_slice], action[batch_slice])
+            np.copyto(self.rewards[buffer_slice], reward[batch_slice])
+            np.copyto(self.next_obses[buffer_slice], next_obs[batch_slice])
+            np.copyto(self.not_dones[buffer_slice], np.logical_not(done[batch_slice]))
+            np.copyto(
+                self.not_dones_no_max[buffer_slice], np.logical_not(done_no_max[batch_slice]))
+
+        _batch_start = 0
+        buffer_end = self.idx + len(obs)
+        if buffer_end > self.capacity:
+            copy_from_to(self.idx, _batch_start, self.capacity - self.idx)
+            self.idx = 0
+            self.full = True
+            _batch_start = self.capacity - self.idx
+
+        _how_many = len(obs) - _batch_start
+        copy_from_to(self.idx, _batch_start, _how_many)
+        self.idx = (self.idx + _how_many) % self.capacity
+        self.full = self.full or self.idx == 0
+
     def sample(self, batch_size):
         idxs = np.random.randint(0,
                                  self.capacity if self.full else self.idx,
