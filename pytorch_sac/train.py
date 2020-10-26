@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import torch
 import os
+import pathlib
 import time
 
 from pytorch_sac.video import VideoRecorder
@@ -9,6 +10,7 @@ from pytorch_sac.replay_buffer import ReplayBuffer
 from pytorch_sac import utils
 
 import hydra
+import numpy as np
 
 
 class Workspace(object):
@@ -65,10 +67,12 @@ class Workspace(object):
         self.logger.log('eval/episode_reward', average_episode_reward,
                         self.step)
         self.logger.dump(self.step)
+        return average_episode_reward
 
     def run(self):
         episode, episode_reward, done = 0, 0, True
         start_time = time.time()
+        best_eval_score = -np.inf
         while self.step < self.cfg.num_train_steps:
             if done:
                 if self.step > 0:
@@ -81,7 +85,10 @@ class Workspace(object):
                 # evaluate agent periodically
                 if self.step > 0 and self.step % self.cfg.eval_frequency == 0:
                     self.logger.log('eval/episode', episode, self.step)
-                    self.evaluate()
+                    score = self.evaluate()
+                    if score > best_eval_score:
+                        best_eval_score = score
+                        self.agent.save(pathlib.Path(self.work_dir))
 
                 self.logger.log('train/episode_reward', episode_reward,
                                 self.step)

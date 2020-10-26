@@ -1,3 +1,5 @@
+import pathlib
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -144,3 +146,10 @@ class SACAgent(Agent):
         if step % self.critic_target_update_frequency == 0:
             utils.soft_update_params(self.critic, self.critic_target,
                                      self.critic_tau)
+
+    def save(self, save_dir):
+        critic_path = save_dir / "critic.pth"
+        actor_path = save_dir / "actor.pth"
+
+        torch.save(self.critic.state_dict(), critic_path)
+        torch.save(self.actor.state_dict(), actor_path)
