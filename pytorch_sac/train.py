@@ -23,15 +23,15 @@ class Workspace(object):
         self.logger = Logger(self.work_dir,
                              save_tb=cfg.log_save_tb,
                              log_frequency=cfg.log_frequency,
-                             agent=cfg.agent.name)
+                             agent="sac")
 
         utils.set_seed_everywhere(cfg.seed)
         self.device = torch.device(cfg.device)
         self.env = utils.make_env(cfg)
 
-        cfg.agent.params.obs_dim = self.env.observation_space.shape[0]
-        cfg.agent.params.action_dim = self.env.action_space.shape[0]
-        cfg.agent.params.action_range = [
+        cfg.agent.obs_dim = self.env.observation_space.shape[0]
+        cfg.agent.action_dim = self.env.action_space.shape[0]
+        cfg.agent.action_range = [
             float(self.env.action_space.low.min()),
             float(self.env.action_space.high.max())
         ]

@@ -31,4 +31,4 @@ exp_name: default
 ## hydra configuration
 hydra:
     run:
-        dir: ./exp/${exp_name}/${env}/${now:%Y.%m.%d}/${now:%H%M}_${agent.name}_${experiment}
+        dir: ./exp/${exp_name}/${env}/${now:%Y.%m.%d}/${now:%H%M}_sac_${experiment}
