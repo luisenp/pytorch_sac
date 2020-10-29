@@ -82,14 +82,6 @@ class Workspace(object):
                     self.logger.dump(
                         self.step, save=(self.step > self.cfg.num_seed_steps))
 
-                # evaluate agent periodically
-                if self.step > 0 and self.step % self.cfg.eval_frequency == 0:
-                    self.logger.log('eval/episode', episode, self.step)
-                    score = self.evaluate()
-                    if score > best_eval_score:
-                        best_eval_score = score
-                        self.agent.save(pathlib.Path(self.work_dir))
-
                 self.logger.log('train/episode_reward', episode_reward,
                                 self.step)
 
@@ -126,6 +118,14 @@ class Workspace(object):
             obs = next_obs
             episode_step += 1
             self.step += 1
+
+            # evaluate agent periodically
+            if self.step % self.cfg.eval_frequency == 0:
+                self.logger.log('eval/episode', episode, self.step)
+                score = self.evaluate()
+                if score > best_eval_score:
+                    best_eval_score = score
+                    self.agent.save(pathlib.Path(self.work_dir))
 
 
 @hydra.main(config_path='config/train.yaml')
