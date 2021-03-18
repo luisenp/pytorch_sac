@@ -1,0 +1,5 @@
+termcolor
+tb-nightly
+imageio
+imageio-ffmpeg
+hydra-core

@@ -9,7 +9,6 @@ from collections import deque
 import random
 import math
 
-import dmc2gym
 
 
 def make_env(cfg):
@@ -18,6 +17,8 @@ def make_env(cfg):
     if "gym___" in cfg.env:
         env = gym.make(cfg.env.split("___")[1])
     else:
+        import dmc2gym
+
         if cfg.env == 'ball_in_cup_catch':
             domain_name = 'ball_in_cup'
             task_name = 'catch'
