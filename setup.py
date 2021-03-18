@@ -1,7 +1,7 @@
 import re
 from setuptools import setup, find_packages
 
-install_requires = [line.rstrip() for line in open("requirements.txt", "r")]
+install_requires = [line.rstrip() for line in open("requirements/main.txt", "r")]
 
 with open("README.md", "r") as f:
     long_description = f.read()
