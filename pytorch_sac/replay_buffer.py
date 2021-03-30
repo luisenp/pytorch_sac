@@ -52,9 +52,9 @@ class ReplayBuffer(object):
         buffer_end = self.idx + len(obs)
         if buffer_end > self.capacity:
             copy_from_to(self.idx, _batch_start, self.capacity - self.idx)
+            _batch_start = self.capacity - self.idx
             self.idx = 0
             self.full = True
-            _batch_start = self.capacity - self.idx
 
         _how_many = len(obs) - _batch_start
         copy_from_to(self.idx, _batch_start, _how_many)
